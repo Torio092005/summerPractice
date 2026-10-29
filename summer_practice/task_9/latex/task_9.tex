@@ -1,0 +1,645 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[russian]{babel}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{minted}
+\usemintedstyle{friendly}
+\usepackage{xcolor}
+\usepackage{geometry}
+\usepackage{amsmath}
+\usepackage{enumitem}
+\usepackage{float}
+\usepackage{indentfirst}
+\usepackage{caption}
+\usepackage{amsfonts}
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, arrows.meta, positioning}
+
+\documentclass[14pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[russian]{babel}
+\usepackage{geometry}
+\usepackage{minted}
+
+\geometry{top=2cm, bottom=2cm, left=2.5cm, right=1.5cm}
+
+% Настройки для листингов кода
+\setminted{
+    fontsize=\small,
+    breaklines=true,
+    autogobble=true,
+    frame=single,
+}
+
+\begin{document}
+
+\begin{titlepage}
+    \centering
+    % Верхний блок
+    {\bfseries МИНИСТЕРСТВО НАУКИ И ВЫСШЕГО ОБРАЗОВАНИЯ РФ \\
+    ФГБОУ ВО «Белгородский государственный технологический университет им. В.Г. Шухова»\par}
+    
+    \vfill
+    
+    % Центральный блок
+    {\bfseries\Large Практическое задание №9\par}
+    \vspace{0.5cm}
+    {\large по дисциплине: Основы программирования и алгоритмизации \par}
+    {\large тема: «Линейная алегбра и сжатие информации» \par}
+    
+    \vfill
+    
+    % Блок авторов
+    \begin{flushright}
+    \begin{tabular}{l}
+        \large Выполнил: студент группы ВТ-252 \\
+        \large Дронь Дмитрий Алексеевич \\
+        \large Проверила: \\
+        \large Стеценко Оксана Николаевна
+    \end{tabular}
+    \end{flushright}
+    
+    \vfill
+    
+    % Нижний блок
+    {\large Белгород, 2026 г. \par}
+\end{titlepage}
+
+\newpage
+\begin{center}
+\section*{Цель работы}
+\end{center}
+Цель методических указаний организовать самостоятельную работу студента по выполнению индивидуальных заданий, направленных на закрепление навыков программирования на языке высокого уровня и способов решения математических задач с применением программы для работы с электронными таблицами MS Excel.
+\newpage
+\begin{center}
+\section*{Индивидуальное задание №9}
+\end{center}
+\textbf{Задача 9.} Матрицу A(m,n) разложить на слагаемые: A = B + C + D, где B — строго нижнетреугольная, C — диагональная, D — строго верхнетреугольная матрицы того же размера. Для экономии памяти матрицы В, С, D хранить в упакованном виде в одномерных массивах; вывести все треугольные матрицы в «треугольном» виде.
+\newpage
+\begin{center}
+\section*{Блок-схема}
+\scalebox{0.60}{
+\begin{tikzpicture}[
+    >=Stealth,
+    line/.style={draw,-Stealth,thick},
+    block/.style={
+        rectangle,
+        rounded corners,
+        draw,
+        align=center,
+        text width=3.5cm,
+        minimum height=1cm
+    },
+    blockplain/.style={
+        rectangle,
+        draw,
+        align=center,
+        text width=3.5cm,
+        minimum height=1cm
+    },
+    decision/.style={
+        diamond,
+        draw,
+        align=center,
+        aspect=2.2,
+        text width=2.4cm,
+        inner sep=2pt
+    }
+]
+
+%------------------ Узлы ------------------
+\node[block] (input) at (0,0)
+{
+decompose\\
+n, A[MAXN][MAXN]\\
+B[], C[], D[]
+};
+
+\node[blockplain] (init) at (0,-2.8)
+{
+idxB = 0\\
+idxC = 0\\
+idxD = 0\\
+i = 0
+};
+
+\node[decision] (icheck) at (0,-6)
+{i < n};
+
+\node[blockplain] (jzero) at (0,-8.5)
+{j = 0};
+
+\node[decision] (jcheck) at (0,-11)
+{j < n};
+
+\node[decision] (igtj) at (0,-14)
+{i > j};
+
+\node[blockplain] (storeB) at (0,-17)
+{
+B[idxB] = A[i][j];\\
+idxB++
+};
+
+\node[decision] (ieqj) at (0,-20)
+{i == j};
+
+\node[blockplain] (storeC) at (0,-23)
+{
+C[idxC] = A[i][j];\\
+idxC++
+};
+
+\node[decision] (iltj) at (0,-26)
+{i < j};
+
+\node[blockplain] (storeD) at (0,-29)
+{
+D[idxD] = A[i][j];\\
+idxD++
+};
+
+\node[blockplain] (jinc) at (0,-31.8)
+{j++};
+
+\node[blockplain] (iinc) at (0,-34.5)
+{i++};
+
+\node[block] (ret) at (0,-37.2)
+{возврат r};
+
+%------------------ Стрелки ------------------
+\draw[] (input) -- (init);
+\draw[] (init) -- (icheck);
+
+% icheck: jzero
+\draw[]
+    (icheck.south) -- ++(0,-0.2)
+    -- (jzero.north);
+
+% icheck: ret (влево и вниз)
+\draw[line]
+    (icheck.west) -- ++(-3.8,0)
+    -- ++(0,-30)
+    -- ++(5.55,0)
+    -- (ret.north);
+
+\draw[] (jzero.south) -- (jcheck.north);
+
+% jcheck: igtj
+\draw[]
+    (jcheck.south) -- ++(0,-0.2)
+    -- (igtj.north);
+
+% jcheck: нет -> iinc
+\draw[line]
+    (jcheck.west) -- ++(-2,0)
+    -- ++(0,-22)
+    -- ++(3.825,0)
+    -- (iinc.north);
+
+% igtj: storeB
+\draw[]
+    (igtj.south) -- ++(0,-0.2)
+    -- (storeB.north);
+
+
+\draw[] (storeB.south) -- (ieqj.north);
+
+% ieqj: storeC
+\draw[]
+    (ieqj.south) -- ++(0,-0.2)
+    -- (storeC.north);
+
+
+\draw[] (storeC.south) -- (iltj.north);
+
+% iltj: storeD
+\draw[]
+    (iltj.south) -- ++(0,-0.2)
+    -- (storeD.north);
+
+\draw[] (storeD.south) -- (jinc.north);
+
+% jinc -> jcheck
+\draw[line]
+    (jinc.east) -- ++(2.5,0)
+    -- ++(0,22.3)
+    -- ++(-4.4,0)
+    -- (jcheck.north);
+
+% iinc -> icheck петля
+\draw[line]
+    (iinc.east) -- ++(4,0)
+    -- ++(0,30)
+    -- ++(-5.9,0)
+    -- (icheck.north);
+
+\end{tikzpicture}
+}
+\end{center}
+\newpage
+\begin{center}
+\scalebox{0.60}{
+\begin{tikzpicture}[
+    >=Stealth,
+    line/.style={draw,-Stealth,thick},
+    block/.style={
+        rectangle,
+        rounded corners,
+        draw,
+        align=center,
+        text width=3.6cm,
+        minimum height=1.2cm
+    },
+    blockplain/.style={
+        rectangle,
+        draw,
+        align=center,
+        text width=2.6cm,
+        minimum height=1cm
+    },
+    io/.style={
+        trapezium,
+        trapezium left angle=70,
+        trapezium right angle=110,
+        trapezium stretches=true,
+        draw,
+        align=center,
+        text width=2.2cm,
+        minimum height=1cm
+    },
+    decision/.style={
+        diamond,
+        draw,
+        align=center,
+        aspect=2.0,
+        text width=2.4cm,
+        inner sep=1pt
+    }
+]
+
+%------------------ Узлы ------------------
+\node[block] (input) at (0,0)
+{
+output\_triangular\\
+n, arr[], type
+};
+
+\node[blockplain] (init) at (0,-2.2)
+{i = 0};
+
+\node[decision] (icheck) at (0,-4.5)
+{i < n};
+
+\node[blockplain] (jzero) at (0,-6.8)
+{j = 0};
+
+\node[decision] (jcheck) at (0,-9.1)
+{j < n};
+
+% --- Блок 1: type == 1 && i > j ---
+\node[decision] (cond1) at (0,-11.8)
+{
+type == 1\\
+\&\& i > j
+};
+
+\node[io] (out1_no) at (-3.2,-13.6)
+{0};
+
+\node[io] (out1_yes) at (3.2,-13.6)
+{arr[idx]};
+
+\node[blockplain] (inc1) at (3.2,-15.6)
+{idx++};
+
+\coordinate (merge1) at (0,-17.0);
+
+% --- Блок 2: type == 2 && i == j ---
+\node[decision] (cond2) at (0,-19.0)
+{
+type\\
+== 2 \&\& i ==\\
+j
+};
+
+\node[io] (out2_no) at (-4.2,-20.8)
+{0};
+
+\node[io] (out2_yes) at (4.2,-20.8)
+{arr[idx]};
+
+\node[blockplain] (inc2) at (4.2,-22.8)
+{idx++};
+
+\coordinate (merge2) at (0,-24.2);
+
+% --- Блок 3: type == 3 && i < j ---
+\node[decision] (cond3) at (0,-26.2)
+{
+type == 3\\
+\&\& i < j
+};
+
+\node[io] (out3_no) at (-3.2,-28.0)
+{0};
+
+\node[io] (out3_yes) at (3.2,-28.0)
+{arr[idx]};
+
+\node[blockplain] (inc3) at (3.2,-30.0)
+{idx++};
+
+\coordinate (merge3) at (0,-31.4);
+
+% --- Инкременты циклов ---
+\node[blockplain] (jinc) at (0,-33.0)
+{j++};
+
+\node[blockplain] (iinc) at (0,-36.0)
+{i++};
+
+%------------------ Стрелки и линии ------------------
+\draw[] (input.south) -- (init.north);
+\draw[line] (init.south) -- (icheck.north);
+\draw[] (icheck.south) -- (jzero.north);
+\draw[line] (jzero.south) -- (jcheck.north);
+\draw[] (jcheck.south) -- (cond1.north);
+
+% Ветвление 1
+\draw[] (cond1.west) -| (out1_no.north) node[pos=0.25, above, font=\small] {нет};
+\draw[] (cond1.east) -| (out1_yes.north) node[pos=0.25, above, font=\small] {да};
+\draw[] (out1_yes.south) -- (inc1.north);
+\draw[] (out1_no.south) |- (merge1);
+\draw[] (inc1.south) |- (merge1);
+\draw[] (merge1) -- (cond2.north);
+
+% Ветвление 2
+\draw[] (cond2.west) -| (out2_no.north) node[pos=0.25, above, font=\small] {нет};
+\draw[] (cond2.east) -| (out2_yes.north) node[pos=0.25, above, font=\small] {да};
+\draw[] (out2_yes.south) -- (inc2.north);
+\draw[] (out2_no.south) |- (merge2);
+\draw[] (inc2.south) |- (merge2);
+\draw[] (merge2) -- (cond3.north);
+
+% Ветвление 3
+\draw[] (cond3.west) -| (out3_no.north) node[pos=0.25, above, font=\small] {нет};
+\draw[] (cond3.east) -| (out3_yes.north) node[pos=0.25, above, font=\small] {да};
+\draw[] (out3_yes.south) -- (inc3.north);
+\draw[] (out3_no.south) |- (merge3);
+\draw[] (inc3.south) |- (merge3);
+\draw[] (merge3) -- (jinc.north);
+
+% Выход из вложенного цикла (j < n -> i++)
+\draw[line]
+    (jcheck.west) -- ++(-5.0,0)
+    |- ([yshift=0.6cm]iinc.north)
+    -- (iinc.north);
+
+% Петля j++ -> j < n
+\draw[line]
+    (jinc.east) -- ++(5.0,0)
+    |- ([yshift=0.5cm]jcheck.north)
+    -- (jcheck.north);
+
+% Петля i++ -> i < n
+\draw[line]
+    (iinc.east) -- ++(7.0,0)
+    |- ([yshift=0.5cm]icheck.north)
+    -- (icheck.north);
+
+\end{tikzpicture}
+}
+\end{center}
+
+\newpage
+\begin{center}
+\section*{Программа}
+\end{center}
+\begin{minted}{c}
+/* Летняя практика. Индивидуальное задание №9 «Линейная алгебра и сжатие информации»
+   Выполнил студент группы ВТ-252 Дронь Д.А.
+   Задание 9: Матрицу A(m,n) разложить на слагаемые: A = B + C + D, где B — строго нижнетреугольная, C — диагональная, D — строго верхнетреугольная матрицы того же размера. Для экономии памяти матрицы В, С, D хранить в упакованном виде в одномерных массивах; вывести все треугольные матрицы в «треугольном» виде.
+*/
+#include <stdio.h>
+
+#define MAXN 50
+
+// Структура результата
+typedef struct {
+    int error_flag;
+} Result;
+
+// Ввод матрицы A(n,n)
+int input_matrix(int *n, int A[MAXN][MAXN]) {
+    int flag = 0;
+    int tn;
+
+    printf("Введите размер матрицы n: ");
+    if (scanf("%d", &tn) != 1) {
+        flag = 1;
+    }
+
+    if (flag == 0) {
+        if (tn <= 0 || tn > MAXN) {
+            flag = 2;
+        }
+    }
+
+    if (flag == 0) {
+        *n = tn;
+        printf("Введите матрицу %d x %d:\n", tn, tn);
+
+        int i = 0;
+        while (i < tn && flag == 0) {
+            int j = 0;
+            while (j < tn && flag == 0) {
+                if (scanf("%d", &A[i][j]) != 1) {
+                    flag = 1;
+                }
+                j++;
+            }
+            i++;
+        }
+    }
+
+    return flag;
+}
+
+/*
+Разложение A = B + C + D
+B — строго нижнетреугольная (i > j)
+C — диагональная (i == j)
+D — строго верхнетреугольная (i < j)
+Все три матрицы храним в одномерных массивах
+*/
+Result decompose(int n, int A[MAXN][MAXN],
+                 int B[], int C[], int D[])
+{
+    Result r;
+    r.error_flag = 0;
+
+    int idxB = 0;
+    int idxC = 0;
+    int idxD = 0;
+
+    int i = 0;
+    while (i < n) {
+        int j = 0;
+        while (j < n) {
+
+            // Строго нижний треугольник
+            if (i > j) {
+                // сохраняем A[i][j] в B
+                B[idxB] = A[i][j];
+                idxB++;
+            }
+
+            // Диагональ
+            if (i == j) {
+                // сохраняем A[i][j] в C
+                C[idxC] = A[i][j];
+                idxC++;
+            }
+
+            // Строго верхний треугольник
+            if (i < j) {
+                // сохраняем A[i][j] в D
+                D[idxD] = A[i][j];
+                idxD++;
+            }
+
+            j++;
+        }
+        i++;
+    }
+
+    return r;
+}
+
+/*
+Вывод треугольной матрицы из упакованного массива
+Тип:
+ type = 1 → нижняя
+ type = 2 → диагональ
+ type = 3 → верхняя
+*/
+void output_triangular(int n, int arr[], int type) {
+    int idx = 0;
+
+    printf("\n");
+
+    int i = 0;
+    while (i < n) {
+        int j = 0;
+        while (j < n) {
+
+            if (type == 1) { // нижняя
+                if (i > j) {
+                    printf("%d ", arr[idx]);
+                    idx++;
+                } else {
+                    printf("0 ");
+                }
+            }
+
+            if (type == 2) { // диагональ
+                if (i == j) {
+                    printf("%d ", arr[idx]);
+                    idx++;
+                } else {
+                    printf("0 ");
+                }
+            }
+
+            if (type == 3) { // верхняя
+                if (i < j) {
+                    printf("%d ", arr[idx]);
+                    idx++;
+                } else {
+                    printf("0 ");
+                }
+            }
+
+            j++;
+        }
+        printf("\n");
+        i++;
+    }
+}
+
+int main(void) {
+    int n;
+    int A[MAXN][MAXN];
+
+    int err = input_matrix(&n, A);
+
+    switch (err) {
+        case 0:
+            break;
+        case 1:
+            printf("Ошибка: некорректный формат ввода.\n");
+            return 1;
+        case 2:
+            printf("Ошибка: n должно быть в диапазоне 1..%d.\n", MAXN);
+            return 1;
+        default:
+            printf("Неизвестная ошибка ввода.\n");
+            return 1;
+    }
+
+    // Размеры упакованных массивов
+    int sizeB = n * (n - 1) / 2;
+    int sizeC = n;
+    int sizeD = n * (n - 1) / 2;
+
+    int B[sizeB];
+    int C[sizeC];
+    int D[sizeD];
+
+    Result r = decompose(n, A, B, C, D);
+
+    switch (r.error_flag) {
+        case 0:
+            printf("\nСтрого нижняя треугольная матрица B:\n");
+            output_triangular(n, B, 1);
+
+            printf("\nДиагональная матрица C:\n");
+            output_triangular(n, C, 2);
+
+            printf("\nСтрого верхняя треугольная матрица D:\n");
+            output_triangular(n, D, 3);
+            break;
+
+        default:
+            printf("Неизвестная ошибка вычислений.\n");
+            break;
+    }
+
+    return 0;
+}
+
+
+\end{minted}
+\newpage
+\begin{center}
+\section*{Тесты}
+\end{center}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{test.png}
+    \caption{Результат выполнения программы}
+\end{figure}
+\newpage
+\begin{center}
+\section*{Вывод}
+\end{center}
+В ходе выполнения работы мне удалось организовать самостоятельную работу по выполнению индивидуальных заданий, направленных на закрепление навыков программирования на языке высокого уровня и способов решения математических задач с применением программы для работы с электронными таблицами MS Excel.
+
+\end{document}
+
+
+
+

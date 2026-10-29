@@ -1,0 +1,572 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[russian]{babel}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{minted}
+\usemintedstyle{friendly}
+\usepackage{xcolor}
+\usepackage{geometry}
+\usepackage{amsmath}
+\usepackage{enumitem}
+\usepackage{float}
+\usepackage{indentfirst}
+\usepackage{caption}
+\usepackage{amsfonts}
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, arrows.meta, positioning}
+
+\documentclass[14pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[russian]{babel}
+\usepackage{geometry}
+\usepackage{minted}
+
+\geometry{top=2cm, bottom=2cm, left=2.5cm, right=1.5cm}
+
+% Настройки для листингов кода
+\setminted{
+    fontsize=\small,
+    breaklines=true,
+    autogobble=true,
+    frame=single,
+}
+
+\begin{document}
+
+\begin{titlepage}
+    \centering
+    % Верхний блок
+    {\bfseries МИНИСТЕРСТВО НАУКИ И ВЫСШЕГО ОБРАЗОВАНИЯ РФ \\
+    ФГБОУ ВО «Белгородский государственный технологический университет им. В.Г. Шухова»\par}
+    
+    \vfill
+    
+    % Центральный блок
+    {\bfseries\Large Практическое задание №7\par}
+    \vspace{0.5cm}
+    {\large по дисциплине: Основы программирования и алгоритмизации \par}
+    {\large тема: «Арифметика» \par}
+    
+    \vfill
+    
+    % Блок авторов
+    \begin{flushright}
+    \begin{tabular}{l}
+        \large Выполнил: студент группы ВТ-252 \\
+        \large Дронь Дмитрий Алексеевич \\
+        \large Проверила: \\
+        \large Стеценко Оксана Николаевна
+    \end{tabular}
+    \end{flushright}
+    
+    \vfill
+    
+    % Нижний блок
+    {\large Белгород, 2026 г. \par}
+\end{titlepage}
+
+\newpage
+\begin{center}
+\section*{Цель работы}
+\end{center}
+Цель методических указаний организовать самостоятельную работу студента по выполнению индивидуальных заданий, направленных на закрепление навыков программирования на языке высокого уровня и способов решения математических задач с применением программы для работы с электронными таблицами MS Excel.
+\newpage
+\section*{Индивидуальное задание №7}
+\textbf{Задача 5.} Для заданного получить таблицу первых простых чисел.
+\newpage
+\begin{center}
+\section*{Блок-схема}
+\end{center}
+\begin{center}
+\scalebox{0.75}{
+\begin{tikzpicture}[
+    >=Stealth,
+    line/.style={draw,-Stealth,thick},
+    block/.style={
+        rectangle,
+        rounded corners,
+        draw,
+        align=center,
+        text width=3cm,
+        minimum height=1cm
+    },
+    blockplain/.style={
+        rectangle,
+        draw,
+        align=center,
+        text width=3cm,
+        minimum height=1cm
+    },
+    decision/.style={
+        diamond,
+        draw,
+        align=center,
+        aspect=2.2,
+        text width=2.8cm,
+        inner sep=2pt
+    }
+]
+
+%------------------ Узлы ------------------
+\node[block] (input) at (0,0)
+{
+is\_prime\\
+x, flag = 1
+};
+
+\node[decision] (xcheck) at (0,-3)
+{x < 2};
+
+\node[blockplain] (flag0) at (0,-5.8)
+{flag = 0};
+
+\node[blockplain] (itwo) at (0,-8.3)
+{i = 2};
+
+\node[decision] (loopcheck) at (0,-11.3)
+{i * i <= x \&\& flag == 1};
+
+\node[decision] (modcheck) at (0,-14.5)
+{x \% i == 0};
+
+\node[blockplain] (flag0b) at (0,-17.3)
+{flag = 0};
+
+\node[blockplain] (iinc) at (0,-19.8)
+{i++};
+
+\node[block] (ret) at (0,-23)
+{возврат flag};
+
+%------------------ Стрелки ------------------
+\draw (input) -- (xcheck);
+
+% xcheck: да -> flag0
+\draw
+    (xcheck.south) -- ++(0,-0.2)
+    node[pos=0.7,right]
+    -- (flag0.north);
+
+
+\draw (flag0.south) -- (itwo.north);
+
+\draw (itwo.south) -- (loopcheck.north);
+
+% loopcheck: -> modcheck
+\draw
+    (loopcheck.south) -- ++(0,-0.2)
+    node[pos=0.7,right]
+    -- (modcheck.north);
+
+% loopcheck: -> ret (влево и вниз)
+\draw[line]
+    (loopcheck.west) -- ++(-3,0)
+    -- ++(0,-10)
+    -- ++(5.625,0)
+    -- (ret.north);
+
+% modcheck:а -> flag0b
+\draw
+    (modcheck.south) -- ++(0,-0.2)
+    node[pos=0.7,right]
+    -- (flag0b.north);
+
+
+
+\draw (flag0b.south) -- (iinc.north);
+
+% iinc -> loopcheck петля (вправо и вверх)
+\draw[line]
+    (iinc.east) -- ++(3.5,0)
+    -- ++(0,10.5)
+    -- ++(-5.15,0)
+    -- (loopcheck.north);
+
+
+\end{tikzpicture}
+}
+\end{center}
+
+\begin{center}
+\scalebox{0.80}{
+\begin{tikzpicture}[
+    >=Stealth,
+    line/.style={draw,-Stealth,thick},
+    block/.style={
+        rectangle,
+        rounded corners,
+        draw,
+        align=center,
+        text width=3cm,
+        minimum height=1cm
+    },
+    blockplain/.style={
+        rectangle,
+        draw,
+        align=center,
+        text width=3cm,
+        minimum height=1cm
+    },
+    io/.style={
+        trapezium,
+        trapezium left angle=70,
+        trapezium right angle=110,
+        draw,
+        align=center,
+        text width=3cm,
+        minimum height=1.1cm
+    },
+    decision/.style={
+        diamond,
+        draw,
+        align=center,
+        aspect=2.2,
+        text width=3cm,
+        inner sep=2pt
+    }
+]
+
+%------------------ Узлы ------------------
+\node[block] (input) at (0,0)
+{
+input\_t\\
+*x, flag = 0,\\
+tt
+};
+
+\node[io] (scantext) at (0,-3)
+{Введите t};
+
+\node[decision] (scanf1) at (0,-6)
+{scanf("\%d", \&tt) != 1};
+
+\node[blockplain] (flag0a) at (-4.5,-8)
+{flag = 0};
+
+\node[blockplain] (flag1a) at (4.5,-8)
+{flag = 1};
+
+\node[decision] (flagcheck1) at (0,-12)
+{flag == 0};
+
+\node[decision] (ttcheck) at (0,-15.5)
+{tt <= 0 \textbar\textbar\ tt > MAXT};
+
+\node[blockplain] (flag0b) at (-4.5,-17.5)
+{flag = 0};
+
+\node[blockplain] (flag2) at (4.5,-17.5)
+{flag = 2};
+
+\node[decision] (flagcheck2) at (0,-21.5)
+{flag == 0};
+
+\node[blockplain] (assignt) at (0,-24.3)
+{*t = tt};
+
+\node[block] (ret) at (0,-27)
+{возврат flag};
+
+%------------------ Стрелки ------------------
+\draw (input) -- (scantext);
+\draw (scantext) -- (scanf1);
+
+% scanf1: нет -> flag0a (влево)
+\draw
+    (scanf1.west) -- ++(-1.87,0)
+    node[midway,above]{нет}
+    -- (flag0a.north);
+
+% scanf1: да -> flag1a (вправо)
+\draw
+    (scanf1.east) -- ++(1.87,0)
+    node[midway,above]{да}
+    -- (flag1a.north);
+
+% flag0a -> flagcheck1 (вниз и вправо)
+\draw
+    (flag0a.south) -- ++(0,-1.5)
+    -- ++(4.5,0)
+    -- (flagcheck1.north);
+
+% flag1a -> flagcheck1 (вниз и влево)
+\draw
+    (flag1a.south) -- ++(0,-1.5)
+    -- ++(-4.5,0)
+    -- (flagcheck1.north);
+
+% flagcheck1: да -> ttcheck
+\draw[line]
+    (flagcheck1.south) -- ++(0,-0.2)
+    node[pos=0.7,right]{да}
+    -- (ttcheck.north);
+
+
+% ttcheck: нет -> flag0b (влево)
+\draw
+    (ttcheck.west) -- ++(-1.87,0)
+    node[midway,above]{нет}
+    -- (flag0b.north);
+
+% ttcheck: да -> flag2 (вправо)
+\draw
+    (ttcheck.east) -- ++(1.87,0)
+    node[midway,above]{да}
+    -- (flag2.north);
+
+% flag0b -> flagcheck2 (вниз и вправо)
+\draw
+    (flag0b.south) -- ++(0,-1.5)
+    -- ++(4.5,0)
+    -- (flagcheck2.north);
+
+% flag2 -> flagcheck2 (вниз и влево)
+\draw
+    (flag2.south) -- ++(0,-1.5)
+    -- ++(-4.5,0)
+    -- (flagcheck2.north);
+
+% flagcheck2: да -> assignt
+\draw
+    (flagcheck2.south) -- ++(0,-0.2)
+    -- (assignt.north);
+
+
+\draw (assignt.south) -- (ret.north);
+
+\end{tikzpicture}
+}
+\end{center}
+\newpage
+\begin{center}
+\scalebox{0.90}{
+\begin{tikzpicture}[
+    >=Stealth,
+    line/.style={draw,-Stealth,thick},
+    block/.style={
+        rectangle,
+        rounded corners,
+        draw,
+        align=center,
+        text width=3.5cm,
+        minimum height=1cm
+    },
+    blockplain/.style={
+        rectangle,
+        draw,
+        align=center,
+        text width=3.5cm,
+        minimum height=1cm
+    },
+    decision/.style={
+        diamond,
+        draw,
+        align=center,
+        aspect=2.2,
+        text width=2.6cm,
+        inner sep=2pt
+    }
+]
+
+%------------------ Узлы ------------------
+\node[block] (input) at (0,0)
+{
+generate\_primes\\
+t, primes[MAXT],\\
+r.error\_flag = 0,\\
+count = 0\\
+x = 2
+};
+
+\node[decision] (countcheck) at (0,-4)
+{count < t};
+
+\node[decision] (primecheck) at (0,-7)
+{is\_prime(x)};
+
+\node[blockplain] (store) at (0,-10)
+{
+primes[count] = x;\\
+count++;
+};
+
+\node[blockplain] (xinc) at (0,-12.8)
+{x++};
+
+\node[block] (ret) at (0,-16)
+{возврат r};
+
+%------------------ Стрелки ------------------
+\draw (input) -- (countcheck);
+
+% countcheck: -> primecheck
+\draw
+    (countcheck.south) -- ++(0,-0.2)
+    -- (primecheck.north);
+
+% countcheck: -> ret (влево и вниз)
+\draw
+    (countcheck.west) -- ++(-2.5,0)
+    -- ++(0,-10.5)
+    -- ++(4.325,0)
+    -- (ret.north);
+
+% primecheck: -> store
+\draw
+    (primecheck.south) -- ++(0,-0.2)
+    -- (store.north);
+
+
+% store -> xinc
+\draw (store.south) -- (xinc.north);
+
+% xinc -> countcheck петля (вправо и вверх)
+\draw
+    (xinc.east) -- ++(2,0)
+    -- ++(0,10.5)
+    -- ++(-3.9,0)
+    -- (countcheck.north);
+
+\end{tikzpicture}
+}
+\end{center}
+\newpage
+\section*{Программа}
+\begin{minted}{c}
+/* Летняя практика. Индивидуальное задание №7 «Арифметика»
+   Выполнил студент группы ВТ-252 Дронь Д.А.
+   Задание 5: Для заданного получить таблицу первых простых чисел.
+*/
+#include <stdio.h>
+
+#define MAXT 10000
+
+// Структура результата
+typedef struct {
+    int error_flag;
+} Result;
+
+// Проверка, является ли число простым
+int is_prime(int x) {
+    int flag = 1;
+
+    if (x < 2) {
+        flag = 0;
+    }
+
+    int i = 2;
+    while (i * i <= x && flag == 1) {
+        if (x % i == 0) {
+            flag = 0;
+        }
+        i++;
+    }
+
+    return flag;
+}
+
+// Ввод t
+int input_t(int *t) {
+    int flag = 0;
+    int tt;
+
+    printf("Введите t: ");
+    if (scanf("%d", &tt) != 1) {
+        flag = 1;
+    } else {flag = 0};
+
+    if (flag == 0) {
+        if (tt <= 0 || tt > MAXT) {
+            flag = 2;
+        } else {flag = 0};
+    }
+
+    if (flag == 0) {
+        *t = tt;
+    }
+
+    return flag;
+}
+
+// Генерация первых t простых чисел
+Result generate_primes(int t, int primes[MAXT]) {
+    Result r;
+    r.error_flag = 0;
+
+    int count = 0;
+    int x = 2;
+
+    while (count < t) {
+        if (is_prime(x)) {
+            primes[count] = x;
+            count++;
+        }
+        x++;
+    }
+
+    return r;
+}
+
+// Вывод таблицы простых чисел
+void output_primes(int t, int primes[MAXT]) {
+    int i = 0;
+    printf("Первые %d простых чисел:\n", t);
+    while (i < t) {
+        printf("%d ", primes[i]);
+        i++;
+    }
+    printf("\n");
+}
+
+// Основная функция
+int main(void) {
+    int t;
+    int primes[MAXT];
+
+    int err = input_t(&t);
+
+    switch (err) {
+        case 0:
+            break;
+        case 1:
+            printf("Ошибка: некорректный формат ввода.\n");
+            return 1;
+        case 2:
+            printf("Ошибка: t должно быть в диапазоне 1..%d.\n", MAXT);
+            return 1;
+        default:
+            printf("Неизвестная ошибка ввода.\n");
+            return 1;
+    }
+
+    Result r = generate_primes(t, primes);
+
+    switch (r.error_flag) {
+        case 0:
+            output_primes(t, primes);
+            break;
+        default:
+            printf("Неизвестная ошибка вычислений.\n");
+            break;
+    }
+
+    return 0;
+}
+
+\end{minted}
+\newpage
+\section*{Тесты}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{test.png}
+    \caption{Результат выполнения программы}
+\end{figure}
+\newpage
+\section*{Вывод}
+В ходе выполнения работы мне удалось организовать самостоятельную работу по выполнению индивидуальных заданий, направленных на закрепление навыков программирования на языке высокого уровня и способов решения математических задач с применением программы для работы с электронными таблицами MS Excel.
+
+\end{document}
+
+
+
